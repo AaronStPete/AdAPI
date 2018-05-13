@@ -13,6 +13,8 @@ using PostingSite.Context;
 
 namespace PostingSite.Controllers
 {
+
+
     public class SearchController : ApiController
     {
         //Search All 
@@ -23,37 +25,44 @@ namespace PostingSite.Controllers
         //public IEnumerable<Models.Ad> Search
 
 
-        [System.Web.Http.Route("Ads")]
+        [System.Web.Http.Route("Ads/Search")]
         [System.Web.Http.HttpGet]
         // GET: Search
-        public IHttpActionResult ReturnAllAds([FromUri]SearchParameters Parameters)
+        public IHttpActionResult GetAdsSearch([FromUri]string title, string category, string location, string content)
         {
             using (var db = new DataContext())
             {
-                /*IQueryable*/
                 var query = db.Ads.AsQueryable();
 
-                if (!String.IsNullOrEmpty(Parameters.Title))
+                if (!String.IsNullOrEmpty(title))
                 {
-                    query = query.Where(w => w.Title.ToString() == Parameters.Title.ToString());
+                    query = query.Where(w => w.Title.ToString().Contains(title));
                 }
 
-                if (!String.IsNullOrEmpty(Parameters.Category))
+                if (!String.IsNullOrEmpty(category))
                 {
-                    query = query.Where(w => w.Category.ToString() == Parameters.Category.ToString());
+                    query = query.Where(w => w.Category.ToString().Contains(category));
                 }
 
-                if (!String.IsNullOrEmpty(Parameters.Location))
+                if (!String.IsNullOrEmpty(location))
                 {
-                    query = query.Where(w => w.Location.ToString() == Parameters.Location.ToString());
+                    query = query.Where(w => w.Location.ToString().Contains(location));
                 }
 
-                if (!String.IsNullOrEmpty(Parameters.Content))
+                if (!String.IsNullOrEmpty(content))
                 {
-                    query = query.Where(w => w.Description.ToString().Contains(Parameters.Content.ToString()));
+                    query = query.Where(w => w.Description.ToString().Contains(content));
                 }
 
-                return Ok(query);
+                var results = query.ToList();
+                if (results.Count == 0)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return Ok(query);
+                }
             }
 
 
